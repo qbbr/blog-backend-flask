@@ -71,6 +71,15 @@ def update_user_profile():
     return '', 204  # No Content
 
 
+@app.route('/user/profile/', methods=['DELETE'])
+@jwt_required
+def delete_user_profile():
+    user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
+    db.session.delete(user)
+    db.session.commit()
+    return '', 204  # No Content
+
+
 @app.route('/posts/', methods=['GET'])
 def get_posts():
     query = Post.query.filter_by(isPrivate=False).order_by(get_sort(request))
