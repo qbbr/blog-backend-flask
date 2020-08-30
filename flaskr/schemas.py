@@ -19,7 +19,7 @@ class UserProfileSchema(ma.SQLAlchemySchema):
         load_instance = True
 
     id = ma.auto_field(dump_only=True)
-    username = ma.auto_field(dump_only=True, validate=[validate.Length(min=4, max=80)])
+    username = ma.auto_field(dump_only=True)
     about = ma.auto_field()
     createdAt = ma.auto_field(dump_only=True)
     postsCount = ma.Function(lambda obj: len(obj.posts))

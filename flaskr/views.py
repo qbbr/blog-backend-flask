@@ -51,7 +51,7 @@ def auth_login():
 @app.route('/user/profile/', methods=['GET'])
 @jwt_required
 def get_user_profile():
-    user = User.query.filter_by(username=get_jwt_identity()).first()
+    user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
     return jsonify(UserProfileSchema().dump(user)), 200  # OK
 
 
