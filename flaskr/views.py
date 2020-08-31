@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from marshmallow import ValidationError
@@ -7,7 +5,7 @@ from sqlalchemy import or_
 
 from flaskr import app, db
 from flaskr.helpers import error_bad_request, error_validation, error_bad_login, render_paginator, get_sort, \
-    get_search_filter
+    get_search_filter, process_tags
 from flaskr.models import User, Post, Tag
 from flaskr.schemas import UserProfileSchema, UserRegistrationSchema, PostSchema, TagSchema
 import markdown
@@ -115,24 +113,12 @@ def create_user_post():
     if not request.is_json:
         return error_bad_request()
     json_data = request.get_json()
-    pprint(json_data)
     user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
-    tags = []
-    for tag_data in json_data['tags']:
-        pprint(tag_data['name'])
-        tag = Tag().query.filter_by(name=tag_data['name']).first()
-        if not tag:
-            tag = Tag(name=tag_data['name'])
-            db.session.add(tag)
-            # db.session.commit()
-        tags.append({'id': tag.id, 'name': tag.name})
-    # db.session.commit()
-    pprint(tags)
-    json_data['tags'] = tags
-    pprint(json_data)
+    tags = process_tags(json_data)
     try:
         post = PostSchema().load(json_data)
         post.user = user
+        post.tags = tags
         db.session.add(post)
         db.session.commit()
     except ValidationError as err:
@@ -156,8 +142,10 @@ def update_user_post(id):
     json_data = request.get_json()
     user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
     post = Post.query.filter_by(user=user, id=id).first_or_404()
+    tags = process_tags(json_data)
     try:
         PostSchema(instance=post).load(json_data)
+        post.tags = tags
         db.session.add(post)
         db.session.commit()
     except ValidationError as err:
@@ -180,5 +168,4 @@ def delete_user_post(id):
 def md2html():
     if not request.is_json:
         return error_bad_request()
-    json_data = request.get_json()
-    return jsonify({'html': markdown.markdown(json_data['text'])}), 200  # OK
+    return jsonify({'html': markdown.markdown(request.json.get('text'))}), 200  # OK

@@ -1,3 +1,5 @@
+import markdown
+from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flaskr import db
@@ -19,14 +21,15 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
 
-tags = db.Table('posts_tags',
-                db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True),
-                db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True)
-                )
+posts_tags_association = db.Table('posts_tags',
+                                  db.Column('tag_id', db.Integer, db.ForeignKey('tags.id'), primary_key=True),
+                                  db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True)
+                                  )
 
 
 class Post(db.Model):
     __tablename__ = 'posts'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('posts', lazy=True))
@@ -34,14 +37,21 @@ class Post(db.Model):
     slug = db.Column(db.String(255))
     text = db.Column(db.Text)
     html = db.Column(db.Text)
-    tags = db.relationship('Tag', secondary=tags, lazy='subquery', backref=db.backref('posts', lazy=True))
+    tags = db.relationship('Tag', secondary=posts_tags_association, lazy='subquery',
+                           backref=db.backref('posts', lazy=True))
     isPrivate = db.Column(db.Boolean, default=False)
     createdAt = db.Column(db.DateTime, default=datetime.utcnow)  # auto_now_add=True
-    updatedAt = db.Column(db.DateTime, default=datetime.utcnow)
+    updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.slug = slugify(self.title)
+    @validates('title')
+    def update_slug(self, key, value):
+        self.slug = slugify(value)
+        return value
+
+    @validates('text')
+    def update_html(self, key, value):
+        self.html = markdown.markdown(value)
+        return value
 
 
 class Tag(db.Model):

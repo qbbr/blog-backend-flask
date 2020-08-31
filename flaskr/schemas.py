@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from marshmallow import validate
 from flaskr import ma
 from flaskr.models import User, Post, Tag
@@ -33,17 +31,16 @@ class UserPostSchema(ma.SQLAlchemySchema):
     username = ma.auto_field(dump_only=True)
 
 
-class TagSchema(ma.SQLAlchemyAutoSchema):
+class TagSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Tag
-        load_instance = True
 
     id = ma.auto_field(dump_only=True)
     name = ma.auto_field(validate=[validate.Length(min=2, max=32)])
     postsCount = ma.Function(lambda obj: len(obj.posts))
 
 
-class PostSchema(ma.SQLAlchemyAutoSchema):
+class PostSchema(ma.SQLAlchemySchema):
     class Meta:
         model = Post
         load_instance = True
@@ -51,9 +48,9 @@ class PostSchema(ma.SQLAlchemyAutoSchema):
     id = ma.auto_field(dump_only=True)
     user = ma.Nested(UserPostSchema)
     title = ma.auto_field(required=True, validate=[validate.Length(min=2, max=255)])
+    slug = ma.auto_field(dump_only=True)
     text = ma.auto_field(required=True)
-    tags = ma.auto_field()
-    # tags = ma.Nested(TagSchema)
+    tags = ma.Nested(TagSchema, many=True)
     html = ma.auto_field(dump_only=True)
     isPrivate = ma.auto_field()
     createdAt = ma.auto_field(dump_only=True)

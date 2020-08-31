@@ -1,7 +1,7 @@
 from flask import jsonify
 from sqlalchemy import desc, asc
 
-from flaskr.models import Post
+from flaskr.models import Post, Tag
 
 PAGE_SIZE = 10
 
@@ -62,3 +62,14 @@ def extract_search_terms(search_query):
     for term in search_query.split():
         terms.add(term.strip())
     return terms
+
+
+def process_tags(json_data):
+    tags = list()
+    for tag_data in json_data['tags']:
+        tag = Tag().query.filter_by(name=tag_data['name']).first()
+        if not tag:
+            tag = Tag(name=tag_data['name'])
+        tags.append(tag)
+    del json_data['tags']
+    return tags
