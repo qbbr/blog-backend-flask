@@ -30,14 +30,14 @@ flask run
 | /user/profile/      | PUT, PATCH | update user profile              | Y            |
 | /user/profile/      | DELETE     | delete user profile              | Y            |
 | /posts/             | GET        | get all posts \w pagination      |              |
-| /post/<slug>/       | GET        | get post by slug                 |              |
+| /post/{slug}/       | GET        | get post by slug                 |              |
 | /tags/              | GET        | get all tags                     |              |
 | /user/posts/        | GET        | get all user posts \w pagination | Y            |
 | /user/posts/        | DELETE     | delete all user posts            | Y            |
 | /user/post/         | POST       | create user post                 | Y            |
-| /user/post/<id>/    | GET        | get user post by id              | Y            |
-| /user/post/<id>/    | PUT, PATCH | update user post by id           | Y            |
-| /user/post/<id>/    | DELETE     | delete user post by id           | Y            |
+| /user/post/{id}/    | GET        | get user post by id              | Y            |
+| /user/post/{id}/    | PUT, PATCH | update user post by id           | Y            |
+| /user/post/{id}/    | DELETE     | delete user post by id           | Y            |
 | /user/post/md2html/ | POST       | convert markdown to html         | Y            |
 
 ## tests
