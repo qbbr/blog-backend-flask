@@ -107,6 +107,15 @@ def get_user_posts():
     return jsonify(render_paginator(request, PostSchema, query)), 200  # OK
 
 
+@app.route('/user/posts/', methods=['DELETE'])
+@jwt_required
+def delete_user_posts():
+    user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
+    Post().query.filter_by(user=user).delete()
+    db.session.commit()
+    return '', 204  # No Content
+
+
 @app.route('/user/post/', methods=['POST'])
 @jwt_required
 def create_user_post():
