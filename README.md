@@ -1,5 +1,7 @@
 # blog-backend-flask
 
+![API Tests](https://github.com/qbbr/blog-backend-flask/workflows/API%20Tests/badge.svg)
+
 Blog REST API on Flask
 
 see [blog-frontend-vuejs](https://github.com/qbbr/blog-fontend-vuejs)
