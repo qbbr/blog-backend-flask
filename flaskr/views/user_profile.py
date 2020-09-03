@@ -25,7 +25,7 @@ def update_user_profile():
     json_data = request.get_json()
     try:
         user = User.query.filter_by(username=get_jwt_identity()).first_or_404()
-        UserProfileSchema().load(json_data, instance=user)
+        UserProfileSchema().load(json_data, instance=user, partial=True)
         db.session.add(user)
         db.session.commit()
     except ValidationError as err:

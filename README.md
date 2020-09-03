@@ -42,4 +42,6 @@ flask run
 
 ## tests
 
-nope, need to write ;)
+```bash
+python -m pytest
+```

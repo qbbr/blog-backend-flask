@@ -65,6 +65,8 @@ def extract_search_terms(search_query):
 
 
 def process_tags(json_data):
+    if 'tags' not in json_data:
+        return None
     tags = list()
     for tag_data in json_data['tags']:
         tag = Tag().query.filter_by(name=tag_data['name']).first()

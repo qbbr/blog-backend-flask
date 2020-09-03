@@ -39,7 +39,8 @@ def create_user_post():
     try:
         post = PostSchema().load(json_data)
         post.user = user
-        post.tags = tags
+        if tags:
+            post.tags = tags
         db.session.add(post)
         db.session.commit()
     except ValidationError as err:
@@ -65,8 +66,9 @@ def update_user_post(id):
     post = Post.query.filter_by(user=user, id=id).first_or_404()
     tags = process_tags(json_data)
     try:
-        PostSchema(instance=post).load(json_data)
-        post.tags = tags
+        PostSchema(instance=post, partial=True).load(json_data)
+        if tags:
+            post.tags = tags
         db.session.add(post)
         db.session.commit()
     except ValidationError as err:
