@@ -1,6 +1,7 @@
 import pytest
 
 from flaskr import create_app, db
+from flaskr.models import User, Post, Tag
 
 
 @pytest.fixture(scope='module')
@@ -9,6 +10,7 @@ def app():
 
     with app.app_context():
         db.create_all()
+        create_fake_data()
 
     return app
 
@@ -23,6 +25,17 @@ def client(app):
 def client(app):
     """A test client for the app."""
     return app.test_client()
+
+
+def create_fake_data():
+    user = User(username='fakeuser1')
+    user.setpassword('fakepassword1')
+    tag = Tag(name='tag1')
+    post = Post(user=user, title='fake title 1', text='fake text 1', tags=[tag])
+    db.session.add(user)
+    db.session.add(tag)
+    db.session.add(post)
+    db.session.commit()
 
 
 class AuthActions:

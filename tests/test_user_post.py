@@ -1,4 +1,4 @@
-from pprint import pprint
+from tests.test_post import assert_paginated_posts, assert_post
 
 post_data = {
     'title': 'my post title 1',
@@ -12,7 +12,7 @@ post_data = {
 post_new_data = {
     'title': 'my post title 2',
 }
-id = None
+post_id = None
 
 
 def test_create(client, auth):
@@ -22,53 +22,50 @@ def test_create(client, auth):
 
 
 def test_get_all(client, auth):
-    global id
+    global post_id
     token = auth.get_token()
     response = client.get('/user/posts/', headers={'Authorization': 'Bearer {}'.format(token)})
     assert 200 == response.status_code
     data = response.get_json()
-    assert 'results' in data
-    assert 'page' in data
-    assert 'pageSize' in data
-    assert 'total' in data
+    assert_paginated_posts(data)
     first_post = data['results'][0]
-    assert 'id' in first_post
-    id = first_post['id']
+    assert_post(first_post)
+    post_id = first_post['id']
 
 
 def test_get(client, auth):
-    global id
+    global post_id
     token = auth.get_token()
-    response = client.get('/user/post/{}/'.format(id), headers={'Authorization': 'Bearer {}'.format(token)})
+    response = client.get('/user/post/{}/'.format(post_id), headers={'Authorization': 'Bearer {}'.format(token)})
     assert 200 == response.status_code
     data = response.get_json()
-    assert 'id' in data
-    assert id == data['id']
+    assert_post(data)
+    assert post_id == data['id']
     assert post_data['title'] == data['title']
 
 
 def test_update(client, auth):
-    global id
+    global post_id
     token = auth.get_token()
-    response = client.put('/user/post/{}/'.format(id), json=post_new_data,
+    response = client.put('/user/post/{}/'.format(post_id), json=post_new_data,
                           headers={'Authorization': 'Bearer {}'.format(token)})
     assert 204 == response.status_code
 
 
 def test_get_new_data(client, auth):
-    global id
+    global post_id
     token = auth.get_token()
-    response = client.get('/user/post/{}/'.format(id), headers={'Authorization': 'Bearer {}'.format(token)})
+    response = client.get('/user/post/{}/'.format(post_id), headers={'Authorization': 'Bearer {}'.format(token)})
     assert 200 == response.status_code
     data = response.get_json()
-    assert 'id' in data
-    assert id == data['id']
+    assert_post(data)
+    assert post_id == data['id']
     assert post_new_data['title'] == data['title']
 
 
 def test_delete(client, auth):
     token = auth.get_token()
-    response = client.delete('/user/post/{}/'.format(id), headers={'Authorization': 'Bearer {}'.format(token)})
+    response = client.delete('/user/post/{}/'.format(post_id), headers={'Authorization': 'Bearer {}'.format(token)})
     assert 204 == response.status_code
 
 
