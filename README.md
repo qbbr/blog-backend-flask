@@ -9,6 +9,7 @@ see [blog-frontend-vuejs](https://github.com/qbbr/blog-fontend-vuejs)
 ## depends
 
  * [python3](https://www.python.org/)
+ * [python3-venv](https://docs.python.org/3/library/venv.html)
  * see [requirements.txt](requirements.txt)
 
 ## run
